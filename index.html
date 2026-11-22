@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerHub - Job Application Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo" onclick="openPage('jobs')">&#128188; Career<span>Hub</span></div>
+        <nav>
+            <button class="nav-btn active" id="nav-jobs" onclick="openPage('jobs')">Jobs</button>
+            <button class="nav-btn" id="nav-saved" onclick="openPage('saved')">Saved <span id="savedCount" class="count">0</span></button>
+            <button class="nav-btn" id="nav-applied" onclick="openPage('applied')">My Applications <span id="appliedCount" class="count">0</span></button>
+        </nav>
+    </header>
+
+    <!-- ================= JOBS PAGE ================= -->
+    <section id="jobs" class="page">
+        <div class="hero">
+            <h1>Find your next job or internship</h1>
+            <p>Fresh openings for students and freshers</p>
+            <input type="text" id="searchText" class="search" placeholder="&#128269; Search by job title, company or skill" oninput="showJobs()">
+        </div>
+
+        <div class="container">
+            <div class="filters">
+                <select id="filterLocation" onchange="showJobs()"></select>
+                <select id="filterType" onchange="showJobs()"></select>
+                <select id="filterCategory" onchange="showJobs()"></select>
+                <select id="sortBy" onchange="showJobs()">
+                    <option value="new">Newest first</option>
+                    <option value="deadline">Deadline soon</option>
+                    <option value="salary">Highest pay</option>
+                </select>
+                <button class="link-btn" onclick="clearFilters()">Clear filters</button>
+            </div>
+            <p id="resultCount" class="small"></p>
+            <div id="jobList" class="job-list"></div>
+        </div>
+    </section>
+
+    <!-- ================= SAVED PAGE ================= -->
+    <section id="saved" class="page hidden">
+        <div class="container">
+            <h2 class="page-title">Saved Jobs</h2>
+            <div id="savedList" class="job-list"></div>
+        </div>
+    </section>
+
+    <!-- ================= MY APPLICATIONS ================= -->
+    <section id="applied" class="page hidden">
+        <div class="container">
+            <h2 class="page-title">My Applications</h2>
+            <div id="appList"></div>
+        </div>
+    </section>
+
+    <!-- ================= APPLY FORM ================= -->
+    <section id="apply" class="page hidden">
+        <div class="container narrow">
+            <button class="link-btn" onclick="openPage('jobs')">&larr; Back to jobs</button>
+            <div id="applyJobInfo" class="apply-job"></div>
+
+            <form id="appForm" onsubmit="submitApplication(event)" novalidate>
+                <p class="note">Fields marked * are required. (Demo: your application is saved only in this browser.)</p>
+
+                <h3 class="form-title">1. Personal Details</h3>
+                <div class="grid2">
+                    <div class="field">
+                        <label for="fName">Full Name *</label>
+                        <input type="text" id="fName" maxlength="40" onblur="checkName()" oninput="recheck(this, checkName)">
+                        <small class="err" id="fNameErr"></small>
+                    </div>
+                    <div class="field">
+                        <label for="fEmail">Email *</label>
+                        <input type="email" id="fEmail" maxlength="60" onblur="checkEmail()" oninput="recheck(this, checkEmail)">
+                        <small class="err" id="fEmailErr"></small>
+                    </div>
+                    <div class="field">
+                        <label for="fPhone">Mobile Number *</label>
+                        <input type="text" id="fPhone" maxlength="10" placeholder="10 digit number" onblur="checkPhone()" oninput="recheck(this, checkPhone)">
+                        <small class="err" id="fPhoneErr"></small>
+                    </div>
+                    <div class="field">
+                        <label for="fDob">Date of Birth *</label>
+                        <input type="date" id="fDob" onchange="checkDob()">
+                        <small class="err" id="fDobErr"></small>
+                    </div>
+                    <div class="field">
+                        <label>Gender *</label>
+                        <div id="fGender" class="radio-box">
+                            <label><input type="radio" name="gender" value="Male" onchange="checkGender()"> Male</label>
+                            <label><input type="radio" name="gender" value="Female" onchange="checkGender()"> Female</label>
+                            <label><input type="radio" name="gender" value="Other" onchange="checkGender()"> Other</label>
+                        </div>
+                        <small class="err" id="fGenderErr"></small>
+                    </div>
+                    <div class="field">
+                        <label for="fCity">Current City *</label>
+                        <input type="text" id="fCity" maxlength="30" onblur="checkCity()" oninput="recheck(this, checkCity)">
+                        <small class="err" id="fCityErr"></small>
+                    </div>
+                </div>
+
+                <h3 class="form-title">2. Education</h3>
+                <div class="grid2">
+                    <div class="field">
+                        <label for="fQual">Highest Qualification *</label>
+                        <select id="fQual" onchange="checkQual()">
+                            <option value="">-- Select --</option>
+                            <option>12th Pass</option>
+                            <option>Diploma</option>
+                            <option>B.Tech / B.E.</option>
+                            <option>B.Sc</option>
+                            <option>BCA</option>
+                            <option>B.Com</option>
+                            <option>BA</option>
+                            <option>BBA</option>
+                            <option>M.Tech / M.E.</option>
+                            <option>M.Sc</option>
+                            <option>MCA</option>
+                            <option>MBA</option>
+                            <option>Other</option>
+                        </select>
+                        <small class="err" id="fQualErr"></small>
+                    </div>
+                    <div class="field">
+                        <label for="fCollege">College / University *</label>
+                        <input type="text" id="fCollege" maxlength="60" onblur="checkCollege()" oninput="recheck(this, checkCollege)">
+                        <small class="err" id="fCollegeErr"></small>
+                    </div>
+                    <div class="field">
+                        <label for="fYear">Passing Year *</label>
+                        <input type="number" id="fYear" placeholder="eg. 2027" onblur="checkYear()" oninput="recheck(this, checkYear)">
+                        <small class="err" id="fYearErr"></small>
+                    </div>
+                    <div class="field">
+                        <label for="fCgpa">CGPA (out of 10) *</label>
+                        <input type="number" id="fCgpa" step="0.01" placeholder="eg. 8.2" onblur="checkCgpa()" oninput="recheck(this, checkCgpa)">
+                        <small class="err" id="fCgpaErr"></small>
+                    </div>
+                </div>
+
+                <h3 class="form-title">3. Skills &amp; Experience</h3>
+                <div class="grid2">
+                    <div class="field">
+                        <label for="fExp">Experience *</label>
+                        <select id="fExp" onchange="checkExp()">
+                            <option value="">-- Select --</option>
+                            <option>Fresher</option>
+                            <option>Less than 1 year</option>
+                            <option>1 - 3 years</option>
+                            <option>More than 3 years</option>
+                        </select>
+                        <small class="err" id="fExpErr"></small>
+                    </div>
+                    <div class="field">
+                        <label for="fLink">LinkedIn / Portfolio Link</label>
+                        <input type="text" id="fLink" placeholder="https://..." onblur="checkLink()" oninput="recheck(this, checkLink)">
+                        <small class="err" id="fLinkErr"></small>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Which skills from this job do you have? *</label>
+                    <div id="fSkills" class="skill-box"></div>
+                    <small class="err" id="fSkillsErr"></small>
+                </div>
+                <div class="field">
+                    <label for="fOther">Other Skills</label>
+                    <input type="text" id="fOther" maxlength="80" placeholder="eg. C, Java, Public speaking">
+                </div>
+
+                <h3 class="form-title">4. Resume &amp; Cover Letter</h3>
+                <div class="field">
+                    <label for="fResume">Upload Resume * <span class="hint">(PDF or Word, max 2 MB)</span></label>
+                    <input type="file" id="fResume" accept=".pdf,.doc,.docx" onchange="checkResume()">
+                    <small class="err" id="fResumeErr"></small>
+                </div>
+                <div class="field">
+                    <label for="fCover">Why should we hire you? *</label>
+                    <textarea id="fCover" rows="5" maxlength="500" placeholder="Write at least 50 characters..." oninput="updateCounter(); recheck(this, checkCover)" onblur="checkCover()"></textarea>
+                    <div class="counter"><span id="coverCount">0</span> / 500</div>
+                    <small class="err" id="fCoverErr"></small>
+                </div>
+
+                <h3 class="form-title">5. Other Details</h3>
+                <div class="grid2">
+                    <div class="field">
+                        <label for="fSalary">Expected Salary (&#8377; per month)</label>
+                        <input type="number" id="fSalary" placeholder="optional" onblur="checkSalary()" oninput="recheck(this, checkSalary)">
+                        <small class="err" id="fSalaryErr"></small>
+                    </div>
+                    <div class="field">
+                        <label for="fStart">Can Join From *</label>
+                        <input type="date" id="fStart" onchange="checkStart()">
+                        <small class="err" id="fStartErr"></small>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="terms" id="fTerms">
+                        <input type="checkbox" id="fAgree" onchange="checkTerms()">
+                        I confirm that all the information given above is correct.
+                    </label>
+                    <small class="err" id="fTermsErr"></small>
+                </div>
+
+                <div class="form-btns">
+                    <button type="submit" class="btn">Submit Application</button>
+                    <button type="button" class="btn grey" onclick="resetForm()">Reset</button>
+                </div>
+                <p id="formMsg" class="form-msg"></p>
+            </form>
+        </div>
+    </section>
+
+    <!-- job details popup -->
+    <div id="detailModal" class="modal hidden" onclick="closeModal(event, 'detailModal')">
+        <div class="modal-box" id="detailBox"></div>
+    </div>
+
+    <!-- success popup -->
+    <div id="successModal" class="modal hidden" onclick="closeModal(event, 'successModal')">
+        <div class="modal-box center" id="successBox"></div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <footer>Made by Piyush Kumar &middot; Web Development Project</footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
